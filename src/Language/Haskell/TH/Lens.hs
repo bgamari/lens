@@ -230,8 +230,13 @@ module Language.Haskell.TH.Lens
   -- ** FunDep Prisms TODO make a lens
   , _FunDep
   -- ** FamFlavour Prisms
+#if MIN_VERSION_template_haskell(2,9,0)
+  -- | These are not available in GHC >= 8.4.1.
+#else
+  -- | Note that these have been removed in GHC >= 8.4.1.
   , _TypeFam
   , _DataFam
+#endif
   -- ** FixityDirection Prisms
   , _InfixL
   , _InfixR
@@ -1689,6 +1694,8 @@ _FunDep
       reviewer (x, y) = FunDep x y
       remitter (FunDep x y) = (x, y)
 
+#if !MIN_VERSION_template_haskell(2,13,0)
+-- | Removed in GHC 8.4.
 _TypeFam :: Prism' FamFlavour ()
 _TypeFam
   = prism' reviewer remitter
@@ -1697,6 +1704,7 @@ _TypeFam
       remitter TypeFam = Just ()
       remitter _ = Nothing
 
+-- | Removed in GHC 8.4.
 _DataFam :: Prism' FamFlavour ()
 _DataFam
   = prism' reviewer remitter
@@ -1704,6 +1712,7 @@ _DataFam
       reviewer () = DataFam
       remitter DataFam = Just ()
       remitter _ = Nothing
+#endif
 
 #if MIN_VERSION_template_haskell(2,9,0)
 tySynEqnPatterns :: Lens' TySynEqn [Type]
